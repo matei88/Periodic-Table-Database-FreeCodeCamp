@@ -164,7 +164,7 @@ UPDATE public.properties
 SET type_id = (
     SELECT type_id FROM public.types WHERE types.type = properties.type
 );
-ALTER TABLE public.properties ADD CONSTRAINT fk_type_id FOREIGN KEY (type_id) REFERENCES types(type_id);
+ALTER TABLE public.properties ADD CONSTRAINT fk_type_id FOREIGN KEY (type_id) REFERENCES public.types(type_id);
 ALTER TABLE public.properties DROP COLUMN type;
 
 UPDATE public.elements SET symbol = INITCAP(symbol);
