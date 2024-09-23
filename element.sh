@@ -8,13 +8,20 @@ then
   exit 0
 fi
 
-ELEMENT=$($PSQL "SELECT atomic_number, name, symbol, atomic_mass, melting_point_celsius, boiling_point_celsius, types.type
-                FROM elements
-                JOIN properties ON elements.atomic_number = properties.atomic_number
-                JOIN types ON properties.type_id = types.type_id
-                WHERE elements.atomic_number = '$1'
-                   OR elements.symbol = '$1'
-                   OR elements.name = '$1'")
+QUERY="SELECT e.atomic_number, name, symbol, atomic_mass, melting_point_celsius, boiling_point_celsius, types.type
+       FROM public.elements e
+       JOIN public.properties ON e.atomic_number = properties.atomic_number
+       JOIN public.types ON properties.type_id = types.type_id"
+
+# Check if input is an integer (atomic number) or a string (symbol or name)
+if [[ $1 =~ ^[0-9]+$ ]]
+then
+  WHERE_CONDITION="WHERE e.atomic_number = $1"
+else
+  WHERE_CONDITION="WHERE e.symbol = '$1' OR e.name = '$1'"
+fi
+
+ELEMENT=$($PSQL "$QUERY $WHERE_CONDITION")
 
 if [[ -z $ELEMENT ]]
 then
